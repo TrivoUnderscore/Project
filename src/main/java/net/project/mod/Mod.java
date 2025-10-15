@@ -6,6 +6,7 @@ import net.project.mod.heartbeat.HeartbeatEffect;
 import net.project.mod.heartbeat.HeartbeatManager;
 import net.project.mod.heartbeat.HeartbeatSetup;
 import net.project.mod.sound.ModSounds;
+import net.project.mod.weight.WeightSetup;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;

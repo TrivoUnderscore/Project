@@ -1,10 +1,11 @@
-package net.project.mod;
+package net.project.mod.weight;
 
 import com.mojang.serialization.Codec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.project.mod.Mod;
 
 import java.util.function.Supplier;
 
