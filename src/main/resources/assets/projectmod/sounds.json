@@ -1,0 +1,14 @@
+{
+  "heart_beat": {
+    "subtitle": "sounds.projectmod.heart_beat",
+    "sounds": [
+      "projectmod:heart_beat"
+    ]
+  },
+  "heart_beat_fast": {
+    "subtitle": "sounds.projectmod.heart_beat_fast",
+    "sounds": [
+      "projectmod:heart_beat_fast"
+    ]
+  }
+}
