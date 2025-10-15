@@ -6,6 +6,8 @@ import net.project.mod.heartbeat.HeartbeatEffect;
 import net.project.mod.heartbeat.HeartbeatManager;
 import net.project.mod.heartbeat.HeartbeatSetup;
 import net.project.mod.sound.ModSounds;
+import net.project.mod.weight.WeightEffect;
+import net.project.mod.weight.WeightManager;
 import net.project.mod.weight.WeightSetup;
 import org.slf4j.Logger;
 
@@ -30,6 +32,8 @@ public class Mod {
         HeartbeatSetup.register(modEventBus);
         CombatSetup.register(modEventBus);
         ModSounds.register(modEventBus);
+        NeoForge.EVENT_BUS.register(new WeightManager());
+        NeoForge.EVENT_BUS.register(new WeightEffect());
         NeoForge.EVENT_BUS.register(new CombatManager());
         NeoForge.EVENT_BUS.register(new HeartbeatEffect());
         NeoForge.EVENT_BUS.register(new HeartbeatManager());

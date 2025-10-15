@@ -8,13 +8,24 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.core.jmx.Server;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class SoundsManager {
-    private boolean isPlayingSound = false;
-    private int tickTime = 0;
+    private static class PlayerSoundData {
+        boolean isPlayingSound = false;
+        int tickTime = 0;
+    }
+
+    private static final Map<UUID, PlayerSoundData> playerData = new HashMap<>();
 
     public void playSound(SoundEvent sound, ServerPlayer player, int loopTimeTicks) {
+        UUID id = player.getUUID();
+        PlayerSoundData data = playerData.computeIfAbsent(id, uuid -> new PlayerSoundData());
+
         Holder<SoundEvent> soundHolder = Holder.direct(sound);
-        if (!isPlayingSound) {
+        if (!data.isPlayingSound) {
             player.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(
                     soundHolder,
                     SoundSource.PLAYERS,
@@ -24,12 +35,12 @@ public class SoundsManager {
                     1.0F,
                     1.0F,
                     player.level().getRandom().nextLong()
-            ));            isPlayingSound = true;
-        } else tickTime++;
+            ));            data.isPlayingSound = true;
+        } else data.tickTime++;
 
-        if (tickTime >= loopTimeTicks) {
-            isPlayingSound = false;
-            tickTime = 0;
+        if (data.tickTime >= loopTimeTicks) {
+            data.isPlayingSound = false;
+            data.tickTime = 0;
         }
     }
 }
