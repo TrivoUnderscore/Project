@@ -12,7 +12,8 @@ import java.util.Objects;
 
 public class WeightEffect {
 
-    private static final ResourceLocation MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "weight_speed");
+    private static final ResourceLocation SPEED_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "weighted_speed_modifier");
+    private static final ResourceLocation JUMP_MODIFIER_ID = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "weighted_jump_modifier");
 
     @SubscribeEvent
     public void tick(PlayerTickEvent.Post event) {
@@ -20,19 +21,20 @@ public class WeightEffect {
 
         int weight = serverPlayer.getData(WeightSetup.WEIGHT.get());
         var speedAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.MOVEMENT_SPEED));
+        var jumpAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.JUMP_STRENGTH));
 
-        if (speedAttr.hasModifier(MODIFIER_ID)) {
-            speedAttr.removeModifier(MODIFIER_ID);
-        }
-
-        double adjustment = -0.001 * weight;
-
-        AttributeModifier modifier = new AttributeModifier(
-                MODIFIER_ID,
-                adjustment,
-                AttributeModifier.Operation.ADD_VALUE
+        AttributeModifier speedModifier = new AttributeModifier(
+                SPEED_MODIFIER_ID,
+                -0.01 * weight,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+        );
+        AttributeModifier jumpModifier = new AttributeModifier(
+                JUMP_MODIFIER_ID,
+                -0.01 * weight,
+                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
         );
 
-        speedAttr.addOrUpdateTransientModifier(modifier);
+        speedAttr.addOrUpdateTransientModifier(speedModifier);
+        jumpAttr.addOrUpdateTransientModifier(jumpModifier);
     }
 }
