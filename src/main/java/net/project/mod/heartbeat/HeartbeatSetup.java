@@ -21,14 +21,6 @@ public class HeartbeatSetup {
                             .build()
             );
 
-    public static final Supplier<AttachmentType<Integer>> TIME =
-            ATTACHMENT_TYPES.register(
-                    "time",
-                    () -> AttachmentType.builder(() -> 0)
-                            .serialize(Codec.INT.fieldOf("time").codec())
-                            .build()
-            );
-
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
     }
