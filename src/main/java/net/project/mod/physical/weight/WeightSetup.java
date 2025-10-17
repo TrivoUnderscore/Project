@@ -1,4 +1,4 @@
-package net.project.mod.weight;
+package net.project.mod.physical.weight;
 
 import com.mojang.serialization.Codec;
 import net.neoforged.bus.api.IEventBus;

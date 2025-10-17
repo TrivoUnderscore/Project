@@ -1,19 +1,24 @@
 package net.project.mod;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 import net.project.mod.combat.CombatManager;
 import net.project.mod.combat.CombatSetup;
 import net.project.mod.heartbeat.HeartbeatEffect;
 import net.project.mod.heartbeat.HeartbeatManager;
 import net.project.mod.heartbeat.HeartbeatSetup;
+import net.project.mod.physical.endurance.EnduranceEffect;
+import net.project.mod.physical.endurance.EnduranceManager;
+import net.project.mod.physical.endurance.EnduranceSetup;
+import net.project.mod.physical.strength.StrengthEffect;
+import net.project.mod.physical.strength.StrengthManager;
+import net.project.mod.physical.strength.StrengthSetup;
 import net.project.mod.sound.ModSounds;
-import net.project.mod.weight.WeightEffect;
-import net.project.mod.weight.WeightManager;
-import net.project.mod.weight.WeightSetup;
+import net.project.mod.physical.weight.WeightEffect;
+import net.project.mod.physical.weight.WeightManager;
+import net.project.mod.physical.weight.WeightSetup;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -33,11 +38,17 @@ public class Mod {
     public Mod(IEventBus modEventBus, ModContainer modContainer) {
         NeoForge.EVENT_BUS.register(this);
 
+        EnduranceSetup.register(modEventBus);
+        StrengthSetup.register(modEventBus);
         WeightSetup.register(modEventBus);
         HeartbeatSetup.register(modEventBus);
         CombatSetup.register(modEventBus);
         ModSounds.register(modEventBus);
         NeoForge.EVENT_BUS.register(KeybindManager.class);
+        NeoForge.EVENT_BUS.register(new EnduranceManager());
+        NeoForge.EVENT_BUS.register(new EnduranceEffect());
+        NeoForge.EVENT_BUS.register(new StrengthManager());
+        NeoForge.EVENT_BUS.register(new StrengthEffect());
         NeoForge.EVENT_BUS.register(new WeightManager());
         NeoForge.EVENT_BUS.register(new WeightEffect());
         NeoForge.EVENT_BUS.register(new CombatManager());
@@ -48,14 +59,17 @@ public class Mod {
 
     @SubscribeEvent
     public void onLivingSwapItems(LivingSwapItemsEvent.Hands event) {
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            serverPlayer.setMainArm(serverPlayer.getMainArm().getOpposite());
+        if (event.getEntity() instanceof Player player) {
+            if (player.level().isClientSide) {
+                Minecraft mc = Minecraft.getInstance();
+                mc.options.mainHand().set(player.getMainArm().getOpposite());
+            } else if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.setMainArm(serverPlayer.getMainArm().getOpposite());
+            }
         }
     }
 
-
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-
     }
 }
