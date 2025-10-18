@@ -59,13 +59,11 @@ public class Mod {
 
     @SubscribeEvent
     public void onLivingSwapItems(LivingSwapItemsEvent.Hands event) {
-        if (event.getEntity() instanceof Player player) {
-            if (player.level().isClientSide) {
-                Minecraft mc = Minecraft.getInstance();
-                mc.options.mainHand().set(player.getMainArm().getOpposite());
-            } else if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.setMainArm(serverPlayer.getMainArm().getOpposite());
-            }
+        Minecraft mc = Minecraft.getInstance();
+        assert mc.player != null;
+        mc.options.mainHand().set(mc.player.getMainArm().getOpposite());
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            serverPlayer.setMainArm(serverPlayer.getMainArm().getOpposite());
         }
     }
 
