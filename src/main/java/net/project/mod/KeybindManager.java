@@ -9,10 +9,10 @@ import static net.project.mod.KeybindSetup.SWITCH_MAINHAND_KEY;
 public class KeybindManager {
     @SubscribeEvent
     public static void onKeyPress(InputEvent.Key event) {
-        Minecraft mc = Minecraft.getInstance();
+        /*Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player != null && SWITCH_MAINHAND_KEY.consumeClick()) {
             player.setMainArm(player.getMainArm().getOpposite());
-        }
+        }*/
     }
 }
