@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Items;
@@ -21,6 +22,7 @@ public class StrengthEffect {
 
     private final Map<UUID, Double> originalSpeed = new HashMap<>();
     private final Map<UUID, Double> originalJump = new HashMap<>();
+    private final Map<UUID, Double> baseAttack = new HashMap<>();
 
     private static final ResourceLocation RIGHT_ARM_MODIFIER = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "right_arm_modifier");
     private static final ResourceLocation LEFT_ARM_MODIFIER = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "left_arm_modifier");
@@ -30,40 +32,48 @@ public class StrengthEffect {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
 
         UUID uuid = serverPlayer.getUUID();
-        double currentSpeed = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.MOVEMENT_SPEED)).getBaseValue();
-        double currentJump = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.JUMP_STRENGTH)).getBaseValue();
 
-        var attackAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.ATTACK_DAMAGE));
+        AttributeInstance moveAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.MOVEMENT_SPEED));
+        AttributeInstance jumpAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.JUMP_STRENGTH));
+        AttributeInstance attackAttr = Objects.requireNonNull(serverPlayer.getAttribute(Attributes.ATTACK_DAMAGE));
+
+        double currentSpeed = moveAttr.getBaseValue();
+        double currentJump = jumpAttr.getBaseValue();
 
         originalSpeed.putIfAbsent(uuid, currentSpeed);
         originalJump.putIfAbsent(uuid, currentJump);
 
-        AttributeModifier rightArmModifier = new AttributeModifier(
-                RIGHT_ARM_MODIFIER,
-                0.01 * serverPlayer.getData(StrengthSetup.R_ARM_STRENGTH.get()),
-                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-        );
-        AttributeModifier leftArmModifier = new AttributeModifier(
-                    LEFT_ARM_MODIFIER,
-                0.1 * serverPlayer.getData(StrengthSetup.L_ARM_STRENGTH.get()),
-                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-        );
-
         if (serverPlayer.getData(StrengthSetup.LEGS_STRENGTH.get()) > 0) {
-            Objects.requireNonNull(serverPlayer.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(originalSpeed.get(uuid) * 1.5);
-            Objects.requireNonNull(serverPlayer.getAttribute(Attributes.JUMP_STRENGTH)).setBaseValue(originalJump.get(uuid) * 1.5);
+            moveAttr.setBaseValue(originalSpeed.get(uuid) * 1.5);
+            jumpAttr.setBaseValue(originalJump.get(uuid) * 1.5);
         } else {
-            Objects.requireNonNull(serverPlayer.getAttribute(Attributes.MOVEMENT_SPEED)).setBaseValue(originalSpeed.get(uuid));
-            Objects.requireNonNull(serverPlayer.getAttribute(Attributes.JUMP_STRENGTH)).setBaseValue(originalJump.get(uuid));
+            moveAttr.setBaseValue(originalSpeed.get(uuid));
+            jumpAttr.setBaseValue(originalJump.get(uuid));
         }
 
-        if (serverPlayer.getMainArm() == HumanoidArm.LEFT) {
-            if (serverPlayer.getData(StrengthSetup.L_ARM_STRENGTH.get()) > 0) {
-                attackAttr.addOrUpdateTransientModifier(leftArmModifier);
-            }
-        } else
-        if (serverPlayer.getData(StrengthSetup.R_ARM_STRENGTH.get()) > 0) {
-            attackAttr.addOrUpdateTransientModifier(rightArmModifier);
+        double base = attackAttr.getBaseValue();
+        double rightStrength = serverPlayer.getData(StrengthSetup.R_ARM_STRENGTH.get());
+        double leftStrength = serverPlayer.getData(StrengthSetup.L_ARM_STRENGTH.get());
+
+        double rightExtra = base * 0.1 * rightStrength;
+        double leftExtra = base * 0.1 * leftStrength;
+
+        if (serverPlayer.getMainArm() == HumanoidArm.LEFT && leftStrength > 0) {
+            AttributeModifier leftMod = new AttributeModifier(
+                    LEFT_ARM_MODIFIER,
+                    leftExtra,
+                    AttributeModifier.Operation.ADD_VALUE
+            );
+            attackAttr.addOrUpdateTransientModifier(leftMod);
+            attackAttr.removeModifier(RIGHT_ARM_MODIFIER);
+        } else if (serverPlayer.getMainArm() == HumanoidArm.RIGHT && rightStrength > 0) {
+            AttributeModifier rightMod = new AttributeModifier(
+                    RIGHT_ARM_MODIFIER,
+                    rightExtra,
+                    AttributeModifier.Operation.ADD_VALUE
+            );
+            attackAttr.addOrUpdateTransientModifier(rightMod);
+            attackAttr.removeModifier(LEFT_ARM_MODIFIER);
         }
     }
 }
