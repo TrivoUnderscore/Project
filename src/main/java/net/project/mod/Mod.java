@@ -44,7 +44,6 @@ public class Mod {
         HeartbeatSetup.register(modEventBus);
         CombatSetup.register(modEventBus);
         ModSounds.register(modEventBus);
-        NeoForge.EVENT_BUS.register(KeybindManager.class);
         NeoForge.EVENT_BUS.register(new EnduranceManager());
         NeoForge.EVENT_BUS.register(new EnduranceEffect());
         NeoForge.EVENT_BUS.register(new StrengthManager());
@@ -54,8 +53,7 @@ public class Mod {
         NeoForge.EVENT_BUS.register(new CombatManager());
         NeoForge.EVENT_BUS.register(new HeartbeatEffect());
         NeoForge.EVENT_BUS.register(new HeartbeatManager());
-        modEventBus.register(KeybindRegistry.class);
-    }
+            }
 
     @SubscribeEvent
     public void onLivingSwapItems(LivingSwapItemsEvent.Hands event) {

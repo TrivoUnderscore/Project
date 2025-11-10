@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.project.mod.Mod;
+import net.project.mod.combat.CombatSetup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,6 @@ public class StrengthEffect {
 
     private final Map<UUID, Double> originalSpeed = new HashMap<>();
     private final Map<UUID, Double> originalJump = new HashMap<>();
-    private final Map<UUID, Double> baseAttack = new HashMap<>();
 
     private static final ResourceLocation RIGHT_ARM_MODIFIER = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "right_arm_modifier");
     private static final ResourceLocation LEFT_ARM_MODIFIER = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "left_arm_modifier");
@@ -39,7 +39,7 @@ public class StrengthEffect {
 
         double currentSpeed = moveAttr.getBaseValue();
         double currentJump = jumpAttr.getBaseValue();
-
+        serverPlayer.getData(CombatSetup.COMBAT);
         originalSpeed.putIfAbsent(uuid, currentSpeed);
         originalJump.putIfAbsent(uuid, currentJump);
 
